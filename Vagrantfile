@@ -12,11 +12,10 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
+
+  ## Choose the box "fedora 32 cloud-base"
   config.vm.box = "fedora/32-cloud-base"
-  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
-  end
+
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -28,11 +27,16 @@ Vagrant.configure("2") do |config|
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
   # config.vm.network "forwarded_port", guest: 80, host: 8080
+  
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
   # via 127.0.0.1 to disable public access
   # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+  ## Set port-forwading from port 8000 on the local machine to port 8000 on the VM, which Django uses in development
+  config.vm.network(
+"forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
+)
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -48,6 +52,8 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
+    ## Define file sharing so that changes on the local machine will also affect the files on the VM
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -63,6 +69,10 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you are using for more
   # information on available options.
+    ## Allocate 1000MB to the VM memory instead of the default 500MB
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
@@ -71,4 +81,6 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
+  ## Configure a file that sets the provisioning (auto-setting up the VM)
+  config.vm.provision "shell", path: "setup.sh", privileged: false
 end
